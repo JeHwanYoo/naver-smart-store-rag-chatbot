@@ -5,11 +5,20 @@ description = ""
 authors = ["Je-Hwan Yoo <yoojehwan1875@gmail.com>"]
 readme = "README.md"
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "single"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.115.6"
 uvicorn = {extras = ["standard"], version = "^0.34.0"}
 
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.4"
 
 [build-system]
 requires = ["poetry-core"]
