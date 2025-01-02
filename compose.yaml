@@ -4,6 +4,16 @@ services:
       context: .
     ports:
       - "8080:8080"
+    environment:
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=8000
     volumes:
       - ./naver_smart_store_rag_chatbot:/app/naver_smart_store_rag_chatbot
     command: uvicorn naver_smart_store_rag_chatbot.main:app --host=0.0.0.0 --port=8080 --reload
+  chroma:
+    image: ghcr.io/chroma-core/chroma:0.6.0
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma:/chroma/chroma
