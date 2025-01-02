@@ -10,6 +10,9 @@ services:
     volumes:
       - ./naver_smart_store_rag_chatbot:/app/naver_smart_store_rag_chatbot
     command: uvicorn naver_smart_store_rag_chatbot.main:app --host=0.0.0.0 --port=8080 --reload
+    depends_on:
+      chroma:
+        condition: service_healthy
   chroma:
     image: ghcr.io/chroma-core/chroma:0.6.0
     restart: always
@@ -17,3 +20,8 @@ services:
       - "8000:8000"
     volumes:
       - ./chroma:/chroma/chroma
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
