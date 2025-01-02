@@ -55,19 +55,25 @@ docker-compose down --build -d
 
 Linter/Formatter 로 [ruff](https://docs.astral.sh/ruff/) 패키지를 사용합니다.
 
-Lint
+pre-commit hook을 적용하려면 다음 명령어를 따라하세요:
+
+```shell
+poetry run pre-commit install
+```
+
+Lint:
 
 ```sh
 poetry run ruff check
 ```
 
-Lint with fix
+Lint with fix:
 
 ```sh
 poetry run ruff check --fix
 ```
 
-Format
+Format:
 
 ```sh
 poetry run ruff format
