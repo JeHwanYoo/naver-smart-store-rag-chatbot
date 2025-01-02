@@ -40,6 +40,49 @@ docker-compose down --build -d
 
 실행중인 컨테이너를 종료합니다.
 
+## 요구사항 분석 및 설계
+
+<details>
+  <summary>주요 기능 및 성능 요구사항</summary>
+
+- 목표: 네이버 스마트스토어의 자주 묻는 질문(FAQ)을 기반으로 질의응답하는 챗봇 만들기
+- [참고 링크](https://help.sell.smartstore.naver.com/index.help)
+- [FAQ 데이터](./faq/final_result.pkl)
+- 프레임워크 & 라이브러리
+  - Backend: [FastAPI](https://fastapi.tiangolo.com/ko/)
+    - Streaming: FastAPI - [StreamingResponse](https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse)
+  - Frontend:
+    - UI: [React](https://ko.legacy.reactjs.org/)
+    - Style: [tailwindcss](https://tailwindcss.com/)
+  - Embedding: [chromadb](https://github.com/chroma-core/chroma)
+    - [OpenAIEmbeddingFunction](https://docs.trychroma.com/integrations/embedding-models/openai)
+    - model_name = [text-embedding-3-small](https://platform.openai.com/docs/guides/embeddings)
+  - LLM: [openai](https://github.com/openai/openai-python)
+  - Database: [MongoDB](https://www.mongodb.com/)
+    - [motor](https://www.mongodb.com/ko-kr/docs/drivers/motor/#std-label-python-async-driver)
+- 임베딩/LLM 모델 사양 및 가격
+  - text-embedding-3-small
+    - Output Dimension: 1,536
+    - $0.020 / 1M tokens
+  - gpt-4o-mini
+    - Context Window: 128,000 tokens
+    - Max Output Tokens: 16,384 tokens
+    - $0.150 / 1M input tokens
+    - $0.600 / 1M output tokens
+- 기능 요구사항
+  - [ ] 001 FAQ 데이터 기반으로 답변 제공
+  - [ ] 002 대화 맥락을 저장
+  - [ ] 003 대화 맥락을 기반으로 답변 제공
+    - [ ] 003-1 이전 질문과 상황을 토대로 적절한 답변을 제공
+    - [ ] 003-2 전체적인 대화 기록을 토대로 적절한 답변을 제공
+  - [ ] 004 대화 맥락을 기반으로 추가 질문 제시
+  - [ ] 005 스마스스토어와 관련없는 내용은 답변하지 않음
+  - [ ] 006 스트리밍 방식의 채팅 제공
+- 비기능 요구사항
+  - [ ] 001 Faithfulness, Answer Relevancy 0.8 이상
+
+</details>
+
 ## 기타
 
 <details>
