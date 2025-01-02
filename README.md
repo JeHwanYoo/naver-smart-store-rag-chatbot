@@ -39,3 +39,14 @@ docker-compose down --build -d
 ```
 
 실행중인 컨테이너를 종료합니다.
+
+## 기타
+
+<details>
+  <summary>Commit convention</summary>
+
+- 커밋 컨벤션은 [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) 규칙을 사용합니다.
+- Git Emoji는 [gitmoji](https://gitmoji.dev/)를 사용합니다.
+
+</details>
+
