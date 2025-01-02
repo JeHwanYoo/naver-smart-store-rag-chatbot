@@ -25,3 +25,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
+  mongo:
+    image: mongo:8.0.4
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
