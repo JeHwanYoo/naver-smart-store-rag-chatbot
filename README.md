@@ -50,3 +50,28 @@ docker-compose down --build -d
 
 </details>
 
+<details>
+  <summary>Code linter/formatter</summary>
+
+Linter/Formatter 로 [ruff](https://docs.astral.sh/ruff/) 패키지를 사용합니다.
+
+Lint
+
+```sh
+poetry run ruff check
+```
+
+Lint with fix
+
+```sh
+poetry run ruff check --fix
+```
+
+Format
+
+```sh
+poetry run ruff format
+```
+
+</details>
+
