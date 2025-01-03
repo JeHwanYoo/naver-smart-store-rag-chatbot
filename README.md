@@ -120,6 +120,65 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
 
 </details>
 
+<details>
+<summary>API</summary>
+
+### API 목록
+
+- GET /v1/chats
+  - 설명: 모든 세션 목록을 불러옵니다.
+  - 성공(200):
+    - Array
+      - `session_id: string`: 세션 ID
+      - `first_message: string`: 사용자의 첫번째 메세지 (UI 용)
+
+- GET /v1/chats/{session_id}
+  - 설명: 특정 세션의 대화 목록을 불러옵니다.
+  - 파라미터:
+    - `session_id: string`: 세션 ID
+  - 성공(200):
+    - Array
+      - `session_id: string`: 세션 ID
+      - `user_message`: 유저 메세지 (질문)
+      - `system_message`: 시스템 메세지 (답변)
+  - 실패(404):
+    - `error_message: "session_id"가 존재하지 않습니다.`
+
+- POST /v1/chats/{session_id}
+  - 설명: 특정 세션에 유제 메세지를 보냅니다. 스트리밍 ID를 반환 받습니다.
+  - 파라미터
+    - `session_id: string`: 세션 ID
+  - 요청 본문:
+    - `user_message`: 유저 메세지 (질문)
+  - 성공(201):
+    - `session_id: string`: 세션 ID
+    - `streaming_id: string`: SSE 통신을 위한 스트리밍 키
+  - 실패(404):
+    - `error_message: "session_id"가 존재하지 않습니다.`
+
+- GET /v1/streaming/{streaming_id}
+  - 설명: 특정 스트리밍 id를 이용하여 답변에 대한 스트리밍을 받습니다.
+  - 파라미터:
+    - `streaming_id: string`: 세션 ID
+  - 성공(200):
+    - SSE 스트리밍 메세지
+  - 실패(404):
+    - `error_message: "streaming_id"가 존재하지 않습니다.`
+
+- GET /v1/chats/{session_id}/recommends
+  - 설명: 가장 최근 대화의 추천 질문 목록을 받습니다. (3개)
+  - 파라미터
+    - `session_id: string`: 세션 ID
+  - 성공(200)
+    - `session_id: string`: 세션 ID
+    - `chatbot_recommends: string[]`: 추천 질문 목록
+  - 실패(400):
+    - `error_message: 아직 추천 질문이 생성되지 않았습니다.`
+  - 실패(404):
+    - `error_message: "session_id"가 존재하지 않습니다.`
+
+</details>
+
 ## 기타
 
 <details>
