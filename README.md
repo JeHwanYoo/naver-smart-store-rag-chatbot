@@ -84,6 +84,23 @@ docker-compose down --build -d
 
 </details>
 
+<details>
+  <summary>시스템 아키텍처</summary>
+
+  <img src="./assets/system_arch.png" alt="system architecture" width="591">
+
+로컬 환경에서 동일한 실행 환경을 제공하기 위해 Back-end, Front-end, VectorDB, Database를 모두 Docker 컨테이너로 구성하여 제공합니다.
+
+또한, 초기 데이터 적재를 위해 FAQ를 벡터화하는 파이프라인을 제공합니다. 이는 로컬에서 초기에 한번만 실행해주면 됩니다.
+
+파이프라인은 3가지 단계로 이루어집니다.
+
+1. 전처리(preprocessing.py): FAQ 내용 중 관련성이 적은 단어, 문장, 특수문자등을 제외하여 데이터 품질을 향상시킵니다.
+2. 구조화(data_structuring.py): 제목과 내용을 분리하여 구조화합니다.
+3. 벡터화(vectorizing.py): 구조화된 내용을 벡터화하여 ChromaDB에 저장합니다.
+
+</details>
+
 ## 기타
 
 <details>
