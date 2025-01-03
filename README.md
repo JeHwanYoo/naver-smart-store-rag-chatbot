@@ -86,7 +86,6 @@ docker-compose down --build -d
 
 <details>
   <summary>시스템 아키텍처</summary>
-
   <img src="./assets/system_arch.png" alt="system architecture" width="591">
 
 로컬 환경에서 동일한 실행 환경을 제공하기 위해 Back-end, Front-end, VectorDB, Database를 모두 Docker 컨테이너로 구성하여 제공합니다.
@@ -98,6 +97,26 @@ docker-compose down --build -d
 1. 전처리(preprocessing.py): FAQ 내용 중 관련성이 적은 단어, 문장, 특수문자등을 제외하여 데이터 품질을 향상시킵니다.
 2. 구조화(data_structuring.py): 제목과 내용을 분리하여 구조화합니다.
 3. 벡터화(vectorizing.py): 구조화된 내용을 벡터화하여 ChromaDB에 저장합니다.
+
+</details>
+
+<details>
+  <summary>ERD</summary>
+  <img src="./assets/erd.png" alt="system architecture" width="591">
+
+ERD는 매우 심플하게 구성했습니다. 이번 과제의 본질에 벗어나지 않게, 인증, 유저와 같은 데이터는 구현하지 않습니다.
+
+테이블 설계는 `Amazon DynamoDB`의 파티셔닝 이론에 착안하여 설계되었습니다. MongoDB에서는 Hash Index로 호환됩니다.
+
+채팅은 여러 세션이 있을 수 있고, `session_id`로 구분됩니다. `session_id`는 DynamoDB의 파티션키에 해당합니다.
+
+즉, 하나의 세션에는 여러 대화가 존재하며, `session_id`로 쿼리하면 해당 세션의 대화를 조회할 수 있습니다.
+
+그리고 최신 채팅을 항상 먼저 보여줘야하기 때문에 `created_at`을 정렬키로 설정합니다. (이번 과제에서 커서 기반 페이지네이션은 고려하지 않습니다.)
+
+chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
+
+대화를 하고 있는 session의 문맥만을 참고하기 위해, session_id를 메타데이터로 설정합니다.
 
 </details>
 
