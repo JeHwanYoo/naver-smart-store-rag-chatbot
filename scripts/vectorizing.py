@@ -96,7 +96,9 @@ def clear_collection(host: str, port: int, collection_name: str):
 
 if __name__ == '__main__':
     # clear_collection(host='localhost', port=8000, collection_name='faq')
-    pkl = load_pickle('../faq/final_result.pkl')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    pkl_path = os.path.join(script_dir, '../faq/final_result.pkl')
+    pkl = load_pickle(pkl_path)
     compressed_pkl = compress_pickle(pkl)
     tiny_pkl = remove_unnecessary_words(compressed_pkl)
     structured_pkl = extract_related_title(tiny_pkl)
