@@ -1,8 +1,8 @@
-from naver_smart_store_rag_chatbot.domain.interfaces.chat_repository import ChatRepository
+from naver_smart_store_rag_chatbot.domain.interfaces.chat_session_repository import ChatSessionRepository
 
 
 class FindAllChatSessionsUseCase:
-    def __init__(self, chat_session_repository: ChatRepository):
+    def __init__(self, chat_session_repository: ChatSessionRepository):
         self.chat_session_repository = chat_session_repository
 
     def execute(self):
