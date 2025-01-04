@@ -8,6 +8,8 @@ services:
       - CHROMA_HOST=chroma
       - CHROMA_PORT=8000
       - MONGO_CONNECTION_STRING=mongodb://root:example@mongo:27017/
+    env_file:
+      - '.env'
     volumes:
       - ./naver_smart_store_rag_chatbot:/app/naver_smart_store_rag_chatbot
     command: uvicorn naver_smart_store_rag_chatbot.main:app --host=0.0.0.0 --port=8080 --reload
