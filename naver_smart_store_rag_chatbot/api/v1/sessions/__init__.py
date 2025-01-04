@@ -9,6 +9,7 @@ from naver_smart_store_rag_chatbot.api.v1.sessions.recommend_response import Rec
 from naver_smart_store_rag_chatbot.api.v1.sessions.send_user_message_request import SendUserMessageRequest
 from naver_smart_store_rag_chatbot.api.v1.sessions.send_user_message_response import SendUserMessageResponse
 from naver_smart_store_rag_chatbot.api.v1.sessions.sessions_response import SessionResponse
+from naver_smart_store_rag_chatbot.domain.usecases.find_all_chat_sessions_use_case import FindAllChatSessionsUseCase
 from naver_smart_store_rag_chatbot.infrastructure.di_container import Container
 
 sessions_router = APIRouter(prefix='/sessions')
@@ -34,6 +35,8 @@ async def get_recommends_by_session_id(session_id: str) -> RecommendsResponse:
 @sessions_router.get('/', description='모든 세션 목록을 불러옵니다.')
 @inject
 async def get_sessions(
-    find_all_chat_sessions_use_case=Depends(Provide[Container.find_all_chat_sessions_use_case]),
+    find_all_chat_sessions_use_case: FindAllChatSessionsUseCase = Depends(
+        Provide[Container.find_all_chat_sessions_use_case]
+    ),
 ) -> List[SessionResponse]:
-    return await find_all_chat_sessions_use_case.execute()
+    return [SessionResponse.from_dict(x.__dict__) for x in await find_all_chat_sessions_use_case.execute()]
