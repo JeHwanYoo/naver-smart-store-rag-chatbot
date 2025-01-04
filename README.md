@@ -172,10 +172,113 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
   - 성공(200)
     - `session_id: string`: 세션 ID
     - `chatbot_recommends: string[]`: 추천 질문 목록
-  - 실패(400):
-    - `error_message: 아직 추천 질문이 생성되지 않았습니다.`
   - 실패(404):
     - `error_message: "session_id"가 존재하지 않습니다.`
+
+</details>
+
+<details>
+  <summary>시퀀스 다이어그램</summary>
+
+### 대화 세션 목록 조회
+
+```mermaid
+sequenceDiagram
+    User ->> API: GET /v1/chats 호출
+    API ->> UseCase: find_all_chat_sessions_use_case.execute() 호출
+    UseCase ->> Repository: chat_sessions_repository.find_all() 호출
+    Repository -->> UseCase: ChatSession[] 반환
+    UseCase -->> API: ChatSession[] 반환
+    API -->> User: ChatSession[] 반환
+```
+
+### 특정 세션의 대화 목록 조회
+
+```mermaid
+sequenceDiagram
+    User ->> API: GET /v1/chats/{session_id} 호출
+    API ->> UseCase: find_chats_by_session_id_use_case.execute() 호출
+    UseCase ->> Repository: chats_repository.find_by_session_id() 호출
+    Repository -->> UseCase: Chat[] 반환
+    UseCase -->> API: Chat[] 반환
+    API -->> User: Chat[] 반환
+```
+
+### 유저 메시지 전송 (작업 큐에 전송)
+
+```mermaid
+sequenceDiagram
+    User ->> API: POST /v1/chats/{session_id} 호출
+    API ->> UseCase: send_user_message_use_case.execute(session_id, user_message) 호출
+    UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
+    alt 세션 존재
+        Repository -->> UseCase: ChatSession 반환
+        UseCase ->> LLMQueue: llm_queue_service.add(session_id, user_message) 호출 (TTL 1분)
+        LLMQueue -->> UseCase: streaming_id 반환
+        UseCase -->> API: session_id, streaming_id 반환
+        API -->> User: 201 session_id, streaming_id 반환
+    else 세션 없음
+        Repository -->> UseCase: null 반환
+        UseCase -->> API: null 반환
+        API -->> User: 404 "session_id"가 존재하지 않습니다.
+    end
+```
+
+1분 이내로 스트리밍을 호출하지 않으면, LLMQueue에서 스트리밍 ID를 삭제합니다.
+
+### LLM 응답 스트리밍
+
+```mermaid
+sequenceDiagram
+    User ->> API: GET /v1/chats/{session_id}/recommends 호출
+    API ->> UseCase: find_recommends_by_session_id_use_case.execute(session_id) 호출
+    UseCase ->> Repository: streaming_system_message_repository.find_one_by_session_id(streaming_id) 호출
+    alt 스트리밍 존재
+        Repository -->> UseCase: ChatSession 반환
+        UseCase ->> LLMQueue: llm_queue_service.find_one_by_streaming_id(streaming_id) 호출
+        LLMQueue -->> UseCase: session_id, user_message 반환
+        UseCase ->> Repository: chats_repository.find_recent_messages(session_id, limit=n) 호출
+        Repository -->> UseCase: recent_n_chats 반환
+        UseCase ->> VectorDB: vector_db_service.find_similar_messages(session_id, user_message, limit=n) 호출
+        VectorDB -->> UseCase: similar_n_chats 반환
+        UseCase --> LLMRAG: llm_rag_service.send_question(session_id, user_message, recent_n_chats, similar_n_chats) 호출
+        LLMRAG --> UseCase: system_message를 스트리밍 방식으로 전송
+        UseCase -->> API: system_message를 스트리밍 방식으로 전송
+        API -->> User: 200 system_message를 스트리밍 방식으로 전송 (SSE)
+        UseCase ->> VectorDB: vector_db_service.save(session_id, user_message, system_message) 저장
+        VectorDB -->> UseCase: 저장 성공
+        UseCase ->> Repository: chats_repository.save(session_id, user_message, system_message) 저장
+        Repository -->> UseCase: 저장 성공
+    else 스트리밍 없음
+        Repository -->> UseCase: null 반환
+        UseCase -->> API: null 반환
+        API -->> User: 404 "streaming_id"가 존재하지 않습니다.
+    end
+```
+
+### 추천 질문 3개 받기
+
+```mermaid
+sequenceDiagram
+    User ->> API: GET /v1/chats/{session_id}/recommends 호출
+    API ->> UseCase: get_recommendations_use_case.execute(session_id) 호출
+    UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
+    alt 세션 존재
+        Repository -->> UseCase: ChatSession 반환
+        UseCase ->> Repository: chats_repository.find_last_message_by_session_id(session_id) 호출
+        Repository -->> UseCase: user_message, system_message 반환
+        UseCase ->> LLMRAG: llm_rag_service.find_recommended_questions(user_message, system_message) 호출
+        LLMRAG -->> UseCase: chatbot_recommends 반환
+        UseCase ->> Repository: chats_repository.update(session_id, chatbot_recommends) 호출
+        Repository -->> UseCase: 업데이트 성공
+        UseCase -->> API: session_id, chatbot_recommends 반환
+        API -->> User: 200 session_id, chatbot_recommends 반환
+    else 세션 없음
+        Repository -->> UseCase: null 반환
+        UseCase -->> API: 404 "session_id"가 존재하지 않습니다."
+        API -->> User: 404 "session_id"가 존재하지 않습니다."
+    end
+```
 
 </details>
 
