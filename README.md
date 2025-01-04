@@ -61,6 +61,7 @@ docker-compose down --build -d
   - Database: [MongoDB](https://www.mongodb.com/)
     - [motor](https://www.mongodb.com/ko-kr/docs/drivers/motor/#std-label-python-async-driver)
   - Evaluation: [RAGAS](https://docs.ragas.io/en/stable/)
+  - TTL Cache: [cachetools](https://github.com/tkem/cachetools/)
 - 임베딩/LLM 모델 사양 및 가격
   - text-embedding-3-small
     - Output Dimension: 1,536
