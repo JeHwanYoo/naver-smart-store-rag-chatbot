@@ -157,14 +157,14 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
 
 ### API 목록
 
-- GET /v1/chats
+- GET /v1/sessions
   - 설명: 모든 세션 목록을 불러옵니다.
   - 성공(200):
     - Array
       - `session_id: string`: 세션 ID
       - `first_message: string`: 사용자의 첫번째 메세지 (UI 용)
 
-- GET /v1/chats/{session_id}
+- GET /v1/sessions/{session_id}/chats
   - 설명: 특정 세션의 대화 목록을 불러옵니다.
   - 파라미터:
     - `session_id: string`: 세션 ID
@@ -176,7 +176,7 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
   - 실패(404):
     - `error_message: "session_id"가 존재하지 않습니다.`
 
-- POST /v1/chats/{session_id}
+- POST /v1/sessions/{session_id}/chats
   - 설명: 특정 세션에 유제 메세지를 보냅니다. 스트리밍 ID를 반환 받습니다.
   - 파라미터
     - `session_id: string`: 세션 ID
@@ -197,7 +197,7 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
   - 실패(404):
     - `error_message: "streaming_id"가 존재하지 않습니다.`
 
-- GET /v1/chats/{session_id}/recommends
+- GET /v1/sessions/{session_id}/recommends
   - 설명: 가장 최근 대화의 추천 질문 목록을 받습니다. (3개)
   - 파라미터
     - `session_id: string`: 세션 ID
@@ -216,7 +216,7 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
 
 ```mermaid
 sequenceDiagram
-    User ->> API: GET /v1/chats 호출
+    User ->> API: GET /v1/sessions 호출
     API ->> UseCase: find_all_chat_sessions_use_case.execute() 호출
     UseCase ->> Repository: chat_sessions_repository.find_all() 호출
     Repository -->> UseCase: ChatSession[] 반환
@@ -228,7 +228,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: GET /v1/chats/{session_id} 호출
+    User ->> API: GET /v1/sessions/{session_id}/chats 호출
     API ->> UseCase: find_chats_by_session_id_use_case.execute() 호출
     UseCase ->> Repository: chats_repository.find_by_session_id() 호출
     Repository -->> UseCase: Chat[] 반환
@@ -240,7 +240,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: POST /v1/chats/{session_id} 호출
+    User ->> API: POST /v1/sessions/{session_id}/chats 호출
     API ->> UseCase: send_user_message_use_case.execute(session_id, user_message) 호출
     UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
     alt 세션 존재
@@ -262,7 +262,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: GET /v1/chats/{session_id}/recommends 호출
+    User ->> API: GET /v1/sessions/{session_id}/recommends 호출
     API ->> UseCase: find_recommends_by_session_id_use_case.execute(session_id) 호출
     UseCase ->> Repository: streaming_system_message_repository.find_one_by_session_id(streaming_id) 호출
     alt 스트리밍 존재
@@ -292,7 +292,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: GET /v1/chats/{session_id}/recommends 호출
+    User ->> API: GET /v1/sessions/{session_id}/recommends 호출
     API ->> UseCase: get_recommendations_use_case.execute(session_id) 호출
     UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
     alt 세션 존재
