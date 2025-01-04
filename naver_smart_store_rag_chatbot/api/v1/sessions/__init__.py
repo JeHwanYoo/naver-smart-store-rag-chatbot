@@ -1,13 +1,15 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends
 
 from naver_smart_store_rag_chatbot.api.v1.sessions.chats_response import ChatResponse
 from naver_smart_store_rag_chatbot.api.v1.sessions.recommend_response import RecommendsResponse
 from naver_smart_store_rag_chatbot.api.v1.sessions.send_user_message_request import SendUserMessageRequest
 from naver_smart_store_rag_chatbot.api.v1.sessions.send_user_message_response import SendUserMessageResponse
 from naver_smart_store_rag_chatbot.api.v1.sessions.sessions_response import SessionResponse
+from naver_smart_store_rag_chatbot.infrastructure.di_container import Container
 
 sessions_router = APIRouter(prefix='/sessions')
 
@@ -30,5 +32,8 @@ async def get_recommends_by_session_id(session_id: str) -> RecommendsResponse:
 
 
 @sessions_router.get('/', description='모든 세션 목록을 불러옵니다.')
-async def get_sessions() -> List[SessionResponse]:
-    return [SessionResponse(session_id=str(uuid.uuid4()), first_message='fake message')]
+@inject
+async def get_sessions(
+    find_all_chat_sessions_use_case=Depends(Provide[Container.find_all_chat_sessions_use_case]),
+) -> List[SessionResponse]:
+    return await find_all_chat_sessions_use_case.execute()
