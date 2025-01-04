@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class SessionsResponse:
+class SessionResponse:
     session_id: str
     first_message: str
