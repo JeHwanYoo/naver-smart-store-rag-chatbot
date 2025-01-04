@@ -4,7 +4,7 @@ from naver_smart_store_rag_chatbot.domain.entities.chat_session import ChatSessi
 from naver_smart_store_rag_chatbot.domain.interfaces.chat_session_repository import ChatSessionRepository
 from naver_smart_store_rag_chatbot.infrastructure.repositories.mongo_client import mongo_main_db
 
-collection_name = 'chat_sessions'
+collection_name = 'chat_histories'
 
 
 class MongoChatSessionRepository(ChatSessionRepository):
