@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 import pytest
 import pytest_asyncio
@@ -30,21 +31,39 @@ async def dummy_sessions(motor_client: AsyncIOMotorClient):
     ]
 
     chat_histories = []
+    base_time = datetime.now()
+
     for session_id in chat_history_session_ids:
         for i in range(3):
             chat_histories.append(
                 {
                     'session_id': session_id,
-                    'created_at': datetime.now(),
+                    'created_at': base_time + timedelta(minutes=i),
                     'user_message': 'fake user message',
                     'system_message': 'fake system message',
                     'recommends': ['fake recommends'],
                 }
             )
+        base_time += timedelta(minutes=3)
 
     await coll.insert_many(chat_histories)
 
-    return [{'session_id': session_id, 'first_message': 'fake user message'} for session_id in chat_history_session_ids]
+    grouped = defaultdict(list)
+
+    for history in chat_histories:
+        grouped[history['session_id']].append(history)
+
+    results = []
+    for session_id, histories in grouped.items():
+        sorted_histories = sorted(histories, key=lambda x: x['created_at'], reverse=True)
+        first_message = sorted_histories[-1]['user_message']
+        latest_created_at = sorted_histories[0]['created_at']
+
+        results.append({'session_id': session_id, 'created_at': latest_created_at, 'first_message': first_message})
+
+    results.sort(key=lambda x: x['created_at'], reverse=True)
+
+    return [{'session_id': r['session_id'], 'first_message': 'fake user message'} for r in results]
 
 
 async def clear_test_db(motor_client: AsyncIOMotorClient):
