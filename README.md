@@ -177,7 +177,7 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
     - `error_message: "session_id"가 존재하지 않습니다.`
 
 - POST /v1/sessions/{session_id}/chats
-  - 설명: 특정 세션에 유제 메세지를 보냅니다. 스트리밍 ID를 반환 받습니다.
+  - 설명: 특정 세션에 유저 메세지를 보냅니다. 스트리밍 ID를 반환 받습니다.
   - 파라미터
     - `session_id: string`: 세션 ID
   - 요청 본문:
