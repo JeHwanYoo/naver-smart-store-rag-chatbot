@@ -27,6 +27,7 @@ chromadb = "^0.6.1"
 python-dotenv = "^1.0.1"
 openai = "^1.59.3"
 motor = "^3.6.0"
+dependency-injector = "^4.44.0"
 
 
 [tool.poetry.group.dev.dependencies]
