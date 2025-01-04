@@ -22,6 +22,14 @@ Docker Compose에서 설치되는 이미지는 다음과 같습니다.
 - ChromaDB 0.6.0
 - MongoDB 8.0.4
 
+## Environment Variables
+
+`.env.template` 참고
+
+```
+OPEN_AI_KEY=sk-proj-... # OPEN_AI_KEY
+```
+
 ## Installation & Running With Docker
 
 ### 실행
