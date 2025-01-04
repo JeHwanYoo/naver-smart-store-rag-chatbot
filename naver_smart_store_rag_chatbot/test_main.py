@@ -2,18 +2,19 @@ import uuid
 from datetime import datetime
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from .main import app
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def http_client():
     return TestClient(app)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def motor_client():
     return AsyncIOMotorClient('mongodb://root:example@localhost:27017/')
 
@@ -49,6 +50,12 @@ async def clear_test_db(motor_client: AsyncIOMotorClient):
     await motor_client.drop_database('test_db')
 
 
+@pytest_asyncio.fixture(autouse=True)
+async def clean_test_db(motor_client: AsyncIOMotorClient):
+    yield
+    await clear_test_db(motor_client)
+
+
 def test_root(http_client: TestClient):
     response = http_client.get('/v1')
     assert response.status_code == 200
@@ -69,5 +76,3 @@ async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorC
 
     assert response.status_code == 200
     assert response.json() == expect
-
-    await clear_test_db(motor_client)
