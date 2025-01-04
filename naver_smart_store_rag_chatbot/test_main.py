@@ -19,7 +19,8 @@ def motor_client():
     return AsyncIOMotorClient('mongodb://root:example@localhost:27017/')
 
 
-async def create_dummy_sessions(motor_client: AsyncIOMotorClient):
+@pytest_asyncio.fixture(scope='function')
+async def dummy_sessions(motor_client: AsyncIOMotorClient):
     test_db = motor_client.get_database('test_db')
     coll = test_db.get_collection('chat_histories')
     chat_history_session_ids = [
@@ -69,10 +70,8 @@ async def test_motor(motor_client: AsyncIOMotorClient):
 
 
 @pytest.mark.asyncio
-async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorClient):
+async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorClient, dummy_sessions):
     response = http_client.get('/v1/sessions')
 
-    expect = await create_dummy_sessions(motor_client)
-
     assert response.status_code == 200
-    assert response.json() == expect
+    assert response.json() == dummy_sessions
