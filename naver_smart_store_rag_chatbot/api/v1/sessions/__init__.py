@@ -31,7 +31,7 @@ async def get_chats_by_session_id(
         Provide[Container.find_chats_by_session_id_use_case]
     ),
 ) -> List[ChatResponse]:
-    return [ChatResponse.from_dict(x) for x in await find_chats_by_session_id_use_case.execute(session_id)]
+    return [ChatResponse.from_dict(x.__dict__) for x in await find_chats_by_session_id_use_case.execute(session_id)]
 
 
 @sessions_router.get('/{session_id}/recommends', description='가장 최근 대화의 추천 질문 목록을 받습니다. (3개)')
