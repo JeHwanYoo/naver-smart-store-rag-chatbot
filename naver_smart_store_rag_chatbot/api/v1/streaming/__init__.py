@@ -27,4 +27,6 @@ async def stream_system_message(
                 break
             yield chunk
 
-    return StreamingResponse(event_generator(), media_type='text/event-stream')
+    return StreamingResponse(
+        event_generator(), media_type='text/event-stream', headers={'Content-Type': 'text/event-stream; charset=utf-8'}
+    )
