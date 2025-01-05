@@ -71,6 +71,20 @@ async def dummy_sessions(motor_client: AsyncIOMotorClient):
     return [{'session_id': r['session_id'], 'first_message': 'fake user message'} for r in results]
 
 
+@pytest_asyncio.fixture(scope='function')
+async def dummy_chats_in_session(motor_client: AsyncIOMotorClient):
+    chat_histories = await create_dummy_chat_histories(motor_client)
+    session_id = chat_histories[0]['session_id']
+
+    results = [history for history in chat_histories if history['session_id'] == session_id]
+    results.sort(key=lambda x: x['created_at'])
+
+    return [
+        {'session_id': r['session_id'], 'user_message': r['user_message'], 'system_message': r['system_message']}
+        for r in results
+    ]
+
+
 async def clear_test_db(motor_client: AsyncIOMotorClient):
     await motor_client.drop_database('test_db')
 
