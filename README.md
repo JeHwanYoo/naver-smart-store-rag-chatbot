@@ -173,8 +173,6 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
       - `session_id: string`: 세션 ID
       - `user_message`: 유저 메세지 (질문)
       - `system_message`: 시스템 메세지 (답변)
-  - 실패(404):
-    - `error_message: "session_id"가 존재하지 않습니다.`
 
 - POST /v1/sessions/{session_id}/chats
   - 설명: 특정 세션에 유저 메세지를 보냅니다. 스트리밍 ID를 반환 받습니다.
@@ -185,8 +183,6 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
   - 성공(201):
     - `session_id: string`: 세션 ID
     - `streaming_id: string`: SSE 통신을 위한 스트리밍 키
-  - 실패(404):
-    - `error_message: "session_id"가 존재하지 않습니다.`
 
 - GET /v1/streaming/{streaming_id}
   - 설명: 특정 스트리밍 id를 이용하여 답변에 대한 스트리밍을 받습니다.
@@ -231,18 +227,10 @@ sequenceDiagram
 sequenceDiagram
     User ->> API: POST /v1/sessions/{session_id}/chats 호출
     API ->> UseCase: send_user_message_use_case.execute(session_id, user_message) 호출
-    UseCase ->> Repository: chats_repository.find_by_session_id(session_id) 호출
-    alt 세션 존재
-        Repository -->> UseCase: Chat[] 반환
-        UseCase ->> LLMQueue: llm_queue_service.add(session_id, user_message) 호출 (TTL 1분)
-        LLMQueue -->> UseCase: streaming_id 반환
-        UseCase -->> API: session_id, streaming_id 반환
-        API -->> User: 201 session_id, streaming_id 반환
-    else 세션 없음
-        Repository -->> UseCase: null 반환
-        UseCase -->> API: null 반환
-        API -->> User: 404 "session_id"가 존재하지 않습니다.
-    end
+    UseCase ->> LLMQueue: llm_queue_service.add(session_id, user_message) 호출 (TTL 1분)
+    LLMQueue -->> UseCase: streaming_id 반환
+    UseCase -->> API: session_id, streaming_id 반환
+    API -->> User: 201 session_id, streaming_id 반환
 ```
 
 1분 이내로 스트리밍을 호출하지 않으면, LLMQueue에서 스트리밍 ID를 삭제합니다.
