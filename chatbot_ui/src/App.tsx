@@ -1,27 +1,12 @@
 import {useState} from 'react'
+import {useSessions} from './hooks/UseSessions.tsx'
 
 function generateTempSessionId() {
   return 'temp_' + Date.now()
 }
 
 export default function App() {
-  const [sessions, setSessions] = useState([
-    {
-      session_id: 'dummy_uuid_1',
-      first_message:
-        '안녕하세요! 주문을 했는데 배송이 언제쯤 도착할지 궁금합니다. 빠른 답변 부탁드려요.',
-    },
-    {
-      session_id: 'dummy_uuid_2',
-      first_message:
-        '결제 후에 옵션을 변경하고 싶은데, 어떻게 해야 하나요?',
-    },
-    {
-      session_id: 'dummy_uuid_3',
-      first_message:
-        '환불 절차는 어떻게 진행되나요? 자세히 알려주세요.',
-    },
-  ])
+  const {sessions, setSessions} = useSessions()
 
   const [currentSessionId, setCurrentSessionId] = useState<string>('dummy_uuid_1')
   const [messagesBySession, setMessagesBySession] = useState<{
