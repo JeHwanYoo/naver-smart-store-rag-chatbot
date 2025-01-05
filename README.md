@@ -242,9 +242,9 @@ sequenceDiagram
 sequenceDiagram
     User ->> API: POST /v1/sessions/{session_id}/chats 호출
     API ->> UseCase: send_user_message_use_case.execute(session_id, user_message) 호출
-    UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
+    UseCase ->> Repository: chats_repository.find_by_session_id(session_id) 호출
     alt 세션 존재
-        Repository -->> UseCase: ChatSession 반환
+        Repository -->> UseCase: Chat[] 반환
         UseCase ->> LLMQueue: llm_queue_service.add(session_id, user_message) 호출 (TTL 1분)
         LLMQueue -->> UseCase: streaming_id 반환
         UseCase -->> API: session_id, streaming_id 반환
@@ -266,7 +266,7 @@ sequenceDiagram
     API ->> UseCase: find_recommends_by_session_id_use_case.execute(session_id) 호출
     UseCase ->> Repository: streaming_system_message_repository.find_one_by_session_id(streaming_id) 호출
     alt 스트리밍 존재
-        Repository -->> UseCase: ChatSession 반환
+        Repository -->> UseCase: Streaming 반환
         UseCase ->> LLMQueue: llm_queue_service.find_one_by_streaming_id(streaming_id) 호출
         LLMQueue -->> UseCase: session_id, user_message 반환
         UseCase ->> Repository: chats_repository.find_recent_messages(session_id, limit=n) 호출
@@ -294,9 +294,9 @@ sequenceDiagram
 sequenceDiagram
     User ->> API: GET /v1/sessions/{session_id}/recommends 호출
     API ->> UseCase: get_recommendations_use_case.execute(session_id) 호출
-    UseCase ->> Repository: chats_repository.find_one_by_session_id(session_id) 호출
+    UseCase ->> Repository: chats_repository.find_by_session_id(session_id) 호출
     alt 세션 존재
-        Repository -->> UseCase: ChatSession 반환
+        Repository -->> UseCase: Chat[] 반환
         UseCase ->> Repository: chats_repository.find_last_message_by_session_id(session_id) 호출
         Repository -->> UseCase: user_message, system_message 반환
         UseCase ->> LLMRAG: llm_rag_service.find_recommended_questions(user_message, system_message) 호출
