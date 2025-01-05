@@ -246,7 +246,7 @@ sequenceDiagram
         LLMQueue -->> UseCase: session_id, user_message 반환
         UseCase ->> VectorDB: vector_db_service.find_related_documents(user_message, limit=n) 호출
         VectorDB -->> UseCase: related_n_documents 반환
-        UseCase ->> Repository: chat_repository.find_recent_messages(session_id, limit=n) 호출
+        UseCase ->> Repository: chat_repository.find_recent_chats(session_id, limit=n) 호출
         Repository -->> UseCase: recent_n_chats 반환
         UseCase --> LLMRAG: llm_rag_service.send_question(user_message, related_n_documents, recent_n_chats) 호출
         LLMRAG --> UseCase: system_message를 스트리밍 방식으로 전송
