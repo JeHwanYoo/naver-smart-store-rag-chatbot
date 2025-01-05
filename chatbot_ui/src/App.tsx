@@ -3,6 +3,7 @@ import {v4 as uuidv4} from 'uuid'
 import {useStreaming} from './hooks/UseStreaming'
 import {useSessions} from './hooks/UseSessions'
 import DOMPurify from 'dompurify'
+import {useMessagesBySession} from './hooks/UseMessagesBySession.tsx'
 
 function generateUUID() {
   return uuidv4()
@@ -11,12 +12,10 @@ function generateUUID() {
 export default function App() {
   const {sessions, setSessions} = useSessions()
   const [currentSessionId, setCurrentSessionId] = useState<string>('')
-  const [messagesBySession, setMessagesBySession] = useState<{
-    [session_id: string]: { sender: string; text: string }[]
-  }>({})
   const [userMessage, setUserMessage] = useState('')
   const [streamingId, setStreamingId] = useState('')
 
+  const {messagesBySession, setMessagesBySession} = useMessagesBySession({sessionId: currentSessionId})
   const {streamingContent} = useStreaming({streamingId})
 
   // 처음 마운트될 때 자동으로 새 대화를 생성
@@ -63,12 +62,6 @@ export default function App() {
   function handleNewConversation() {
     const newSessionId = generateUUID()
     setCurrentSessionId(newSessionId)
-    setMessagesBySession((prev) => ({
-      ...prev,
-      [newSessionId]: [
-        {sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'},
-      ],
-    }))
   }
 
   async function handleSubmit(e: React.FormEvent) {

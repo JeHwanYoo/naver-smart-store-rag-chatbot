@@ -18,8 +18,7 @@ export function useStreaming(props: { streamingId: string }) {
       setStreamingContent((prev) => prev + event.data)
     }
 
-    eventSource.onerror = (e) => {
-      console.error('SSE connection error.', e)
+    eventSource.onerror = () => {
       eventSource.close()
     }
 
