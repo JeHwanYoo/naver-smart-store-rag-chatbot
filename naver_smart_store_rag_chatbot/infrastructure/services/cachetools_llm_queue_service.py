@@ -14,5 +14,5 @@ class CachetoolsLLMQueueService(LLMQueueService):
     async def add(self, session_id: str, user_message: str) -> str:
         streaming_id = uuid4()
         async with self.lock:
-            self.cache[session_id] = (str(streaming_id), user_message)
+            self.cache[str(streaming_id)] = (session_id, user_message)
         return str(streaming_id)
