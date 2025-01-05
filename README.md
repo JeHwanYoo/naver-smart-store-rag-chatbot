@@ -51,9 +51,9 @@ docker-compose down --build -d
 
 ## Seeding FAQ embeddings
 
-2,717개의 FAQ를 임베딩합니다. OpenAI의 `text-embedding-3-small` 모델을 사용합니다.
+2,717개의 FAQ 파일을 임베딩 할 수 있도록 `scripts/*` 에 스크립트를 짜놨습니다. 임베딩에는 OpenAI의  `text-embedding-3-small` 모델을 사용합니다. .env에 작성된 OPEN_AI_KEY 를 사용합니다.
 
-의존성 설치를 위한 [poetry](https://python-poetry.org/)와 OPEN_AI_KEY 환경 변수가 필요합니다.
+이 스크립트는 모든 도커 컴포즈 서비스가 로드되고 한번만 실행되면 됩니다. 실행전에 ChromaDB 컨테이너가 정상적으로 실행중인지 확인해주세요.
 
 ### 의존성 설치
 
@@ -61,10 +61,7 @@ docker-compose down --build -d
 poetry install
 ```
 
-### 임베딩
-
-임베딩 스크립트를 실행하기전에 ChromaDB의 도커로
-실행해주세요: [Installation & Running With Docker](#installation--running-with-docker) 참고
+### 임베딩 스크립트 실행
 
 ```sh
 poetry run python scripts/vectorizing.py
