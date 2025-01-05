@@ -16,7 +16,7 @@ export default function App() {
   const [streamingId, setStreamingId] = useState('')
 
   const {messagesBySession, setMessagesBySession} = useMessagesBySession({sessionId: currentSessionId})
-  const {streamingContent, isStreaming} = useStreaming({streamingId})
+  const {streamingContent, setStreamingContent, isStreaming} = useStreaming({streamingId})
 
   // 메시지 컨테이너의 끝을 참조할 ref 생성
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -74,7 +74,13 @@ export default function App() {
 
   function handleNewConversation() {
     const newSessionId = generateUUID()
+    setStreamingContent('')
     setCurrentSessionId(newSessionId)
+  }
+
+  function handleTapConversation(sessionId: string) {
+    setStreamingContent('')
+    setCurrentSessionId(sessionId)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -137,9 +143,10 @@ export default function App() {
           return (
             <button
               key={session.session_id}
-              onClick={() => setCurrentSessionId(session.session_id)}
+              onClick={() => handleTapConversation(session.session_id)}
               disabled={isStreaming}
               className={`
+                w-full text-left
                 cursor-pointer rounded p-2 mb-2 max-w-full
                 overflow-hidden text-ellipsis whitespace-nowrap
                 ${isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
@@ -159,7 +166,19 @@ export default function App() {
         </div>
 
         <div className="flex-1 overflow-auto p-4">
-          {(messagesBySession[currentSessionId] || []).map((msg, idx) => (
+          <div
+            className={`mb-2 flex justify-start'`}
+          >
+            <div
+              className={`rounded-md px-3 py-2 text-sm bg-gray-200 text-gray-800`}
+            >
+              <>
+                🤖 챗봇<br/>
+              </>
+              <div>안녕하세요! 무엇을 도와드릴까요?</div>
+            </div>
+          </div>
+          {(messagesBySession[currentSessionId] ?? []).map((msg, idx) => (
             <div
               key={idx}
               className={`mb-2 flex ${

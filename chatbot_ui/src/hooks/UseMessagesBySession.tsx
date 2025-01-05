@@ -7,15 +7,7 @@ export function useMessagesBySession(props: { sessionId: string }) {
 
   useEffect(() => {
     if (!props.sessionId) return
-
-    if (!messagesBySession[props.sessionId] || messagesBySession[props.sessionId].length === 0) {
-      setMessagesBySession((prev) => ({
-        ...prev,
-        [props.sessionId]: [
-          {sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'},
-        ],
-      }))
-
+    if (!messagesBySession[props.sessionId]) {
       fetch(`${import.meta.env.VITE_API_PATH}/v1/sessions/${props.sessionId}/chats`).then(async r => {
         const chats = await r.json()
 
@@ -23,7 +15,7 @@ export function useMessagesBySession(props: { sessionId: string }) {
           setMessagesBySession((prev) => ({
             ...prev,
             [props.sessionId]: [
-              ...prev[props.sessionId],
+              ...(prev[props.sessionId] ?? []),
               {sender: 'user', text: chat.user_message},
               {sender: 'bot', text: chat.system_message},
             ],

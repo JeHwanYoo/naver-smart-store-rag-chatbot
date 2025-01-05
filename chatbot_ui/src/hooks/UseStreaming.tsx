@@ -31,5 +31,5 @@ export function useStreaming(props: { streamingId: string }) {
     }
   }, [props.streamingId])
 
-  return {streamingContent, isStreaming}
+  return {streamingContent, setStreamingContent, isStreaming}
 }
