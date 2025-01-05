@@ -8,7 +8,3 @@ class VectorDBService(ABC):
     @abstractmethod
     async def find_related_documents(self, user_message: str, limit=5) -> List[Document]:
         pass
-
-    @abstractmethod
-    async def save(self, session_id: str, user_message: str, system_message: str) -> None:
-        pass

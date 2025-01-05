@@ -21,15 +21,22 @@ class StreamingSystemMessageUseCase:
         task = self.llm_queue_service.get(streaming_id)
 
         if not task:
-            return None
+            return
 
         session_id, user_message = task
 
         related_documents = await self.vector_db_service.find_related_documents(user_message=user_message)
         recent_chats = await self.chat_repository.find_recent_chats(session_id)
 
-        return self.llm_rag_service.send_question(
+        system_message = ''
+        for chunk in self.llm_rag_service.send_question(
             user_message,
             related_documents=related_documents,
             recent_chats=recent_chats,
-        )
+        ):
+            content = chunk.choices[0].delta.content
+            if content:
+                system_message += content
+                yield content
+
+        await self.chat_repository.save(session_id, user_message=user_message, system_message=system_message)

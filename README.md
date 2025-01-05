@@ -252,8 +252,6 @@ sequenceDiagram
         LLMRAG --> UseCase: system_message를 스트리밍 방식으로 전송
         UseCase -->> API: system_message를 스트리밍 방식으로 전송
         API -->> User: 200 system_message를 스트리밍 방식으로 전송 (SSE)
-        UseCase ->> VectorDB: vector_db_service.save(session_id, user_message, system_message) 저장
-        VectorDB -->> UseCase: 저장 성공
         UseCase ->> Repository: chat_repository.save(session_id, user_message, system_message) 저장
         Repository -->> UseCase: 저장 성공
     else 스트리밍 없음
