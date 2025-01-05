@@ -1,21 +1,19 @@
-import {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useSessions} from './hooks/UseSessions.tsx'
+import {v4 as uuidv4} from 'uuid'
 
-function generateTempSessionId() {
-  return 'temp_' + Date.now()
+
+function generateUUID() {
+  return uuidv4()
 }
 
 export default function App() {
   const {sessions, setSessions} = useSessions()
 
-  const [currentSessionId, setCurrentSessionId] = useState<string>('dummy_uuid_1')
+  const [currentSessionId, setCurrentSessionId] = useState<string>('')
   const [messagesBySession, setMessagesBySession] = useState<{
     [session_id: string]: { sender: string; text: string }[]
-  }>({
-    dummy_uuid_1: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
-    dummy_uuid_2: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
-    dummy_uuid_3: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
-  })
+  }>({})
 
   const [userMessage, setUserMessage] = useState('')
 
@@ -28,18 +26,17 @@ export default function App() {
   }
 
   function handleNewConversation() {
-    const newTempId = generateTempSessionId()
-    setCurrentSessionId(newTempId)
+    const newSessionId = generateUUID()
+    setCurrentSessionId(newSessionId)
     setMessagesBySession((prev) => ({
       ...prev,
-      [newTempId]: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
+      [newSessionId]: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
     }))
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!userMessage.trim()) return
-    if (!currentSessionId) return
 
     const newUserMessage = {sender: 'user', text: userMessage}
 
@@ -64,6 +61,19 @@ export default function App() {
       ])
     }
 
+    const postResult = await fetch(`${import.meta.env.VITE_API_PATH}/v1/sessions/${currentSessionId}/chats`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        user_message: userMessage,
+      }),
+    })
+
+    const {streaming_id} = await postResult.json()
+    console.log(streaming_id)
+
     mockSendMessage(userMessage).then((response) => {
       const newBotMessage = {sender: 'bot', text: response}
       setMessagesBySession((prev) => {
@@ -76,6 +86,8 @@ export default function App() {
     })
     setUserMessage('')
   }
+
+  useEffect(handleNewConversation, [])
 
   return (
     <div className="flex h-screen w-full bg-gray-100">
@@ -106,35 +118,27 @@ export default function App() {
           <h1 className="text-xl font-bold">네이버스마트 스토어 FAQ 챗봇</h1>
         </div>
 
-        {currentSessionId ? (
-          <div className="flex-1 overflow-auto p-4">
-            {(messagesBySession[currentSessionId] || []).map((msg, idx) => (
+        <div className="flex-1 overflow-auto p-4">
+          {(messagesBySession[currentSessionId] || []).map((msg, idx) => (
+            <div
+              key={idx}
+              className={`mb-2 flex ${
+                msg.sender === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
               <div
-                key={idx}
-                className={`mb-2 flex ${
-                  msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                className={`rounded-md px-3 py-2 text-sm ${
+                  msg.sender === 'user'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                <div
-                  className={`rounded-md px-3 py-2 text-sm ${
-                    msg.sender === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-800'
-                  }`}
-                >
-                  {msg.sender === 'bot' && <>🤖 챗봇<br/></>}
-                  {msg.text}
-                </div>
+                {msg.sender === 'bot' && <>🤖 챗봇<br/></>}
+                {msg.text}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex-1 overflow-auto p-4 flex items-center justify-center text-gray-500">
-            새로운 세션이 선택되었습니다.
-            <br/>
-            아직 대화가 없습니다.
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
 
         <form onSubmit={handleSubmit} className="border-t p-4">
           <div className="flex gap-2">
