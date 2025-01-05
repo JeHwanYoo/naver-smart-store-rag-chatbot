@@ -69,6 +69,14 @@ poetry run python scripts/vectorizing.py
 
 > 💡 시간이 꽤 소모되기 때문에 장시간 자리를 비울 경우 [caffeinate](https://seorenn.tistory.com/61)를 고려해보세요.
 
+## 챗봇 실행
+
+모든 과정이 완료되었으면 챗봇에 접속하여 테스트 해주세요~
+
+http://localhost:5173
+
+<img src="./assets/chatbot_ui.jpeg" alt="chatbot" width="800">
+
 ## 요구사항 분석 및 설계
 
 <details>
