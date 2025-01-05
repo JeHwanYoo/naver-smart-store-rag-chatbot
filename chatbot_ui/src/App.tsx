@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react'
-import {useSessions} from './hooks/UseSessions.tsx'
 import {v4 as uuidv4} from 'uuid'
-
+import {useStreaming} from './hooks/UseStreaming'
+import {useSessions} from './hooks/UseSessions'
+import DOMPurify from 'dompurify'
 
 function generateUUID() {
   return uuidv4()
@@ -9,37 +10,72 @@ function generateUUID() {
 
 export default function App() {
   const {sessions, setSessions} = useSessions()
-
   const [currentSessionId, setCurrentSessionId] = useState<string>('')
   const [messagesBySession, setMessagesBySession] = useState<{
     [session_id: string]: { sender: string; text: string }[]
   }>({})
-
   const [userMessage, setUserMessage] = useState('')
+  const [streamingId, setStreamingId] = useState('')
 
-  function mockSendMessage(message: string): Promise<string> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`"${message}"에 대한 답변입니다: `)
-      }, 1000)
+  const {streamingContent} = useStreaming({streamingId})
+
+  // 처음 마운트될 때 자동으로 새 대화를 생성
+  useEffect(() => {
+    handleNewConversation()
+  }, [])
+
+  // streaming 값이 변경될 때마다 마지막 봇 메시지로 실시간 반영
+  useEffect(() => {
+    if (!streamingContent) return
+    if (!currentSessionId) return
+
+    setMessagesBySession((prev) => {
+      const currentMessages = prev[currentSessionId] || []
+      // 마지막 메시지가 봇(bot)인지 확인
+      const lastMessage = currentMessages[currentMessages.length - 1]
+
+      // 만약 마지막 메시지가 'bot'이 아니라면 새 메시지를 추가
+      if (!lastMessage || lastMessage.sender !== 'bot') {
+        return {
+          ...prev,
+          [currentSessionId]: [
+            ...currentMessages,
+            {sender: 'bot', text: streamingContent},
+          ],
+        }
+      } else {
+        // 마지막 메시지가 'bot'이면 해당 메시지에 문자열을 갱신
+        const updatedLastMessage = {
+          ...lastMessage,
+          text: streamingContent,
+        }
+        return {
+          ...prev,
+          [currentSessionId]: [
+            ...currentMessages.slice(0, -1),
+            updatedLastMessage,
+          ],
+        }
+      }
     })
-  }
+  }, [streamingContent, currentSessionId])
 
   function handleNewConversation() {
     const newSessionId = generateUUID()
     setCurrentSessionId(newSessionId)
     setMessagesBySession((prev) => ({
       ...prev,
-      [newSessionId]: [{sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'}],
+      [newSessionId]: [
+        {sender: 'bot', text: '안녕하세요! 무엇을 도와드릴까요?'},
+      ],
     }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!userMessage.trim()) return
+    if (!userMessage.trim() || !currentSessionId) return
 
     const newUserMessage = {sender: 'user', text: userMessage}
-
     setMessagesBySession((prev) => {
       const currentMessages = prev[currentSessionId] || []
       return {
@@ -48,9 +84,7 @@ export default function App() {
       }
     })
 
-    const foundSession = sessions.find(
-      (s) => s.session_id === currentSessionId,
-    )
+    const foundSession = sessions.find((s) => s.session_id === currentSessionId)
     if (!foundSession) {
       setSessions((prev) => [
         {
@@ -61,33 +95,20 @@ export default function App() {
       ])
     }
 
-    const postResult = await fetch(`${import.meta.env.VITE_API_PATH}/v1/sessions/${currentSessionId}/chats`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
+    // 서버에 user_message 전송 후, streamingId 수신
+    const postResult = await fetch(
+      `${import.meta.env.VITE_API_PATH}/v1/sessions/${currentSessionId}/chats`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json; charset=utf-8'},
+        body: JSON.stringify({user_message: userMessage}),
       },
-      body: JSON.stringify({
-        user_message: userMessage,
-      }),
-    })
-
+    )
     const {streaming_id} = await postResult.json()
-    console.log(streaming_id)
+    setStreamingId(streaming_id)
 
-    mockSendMessage(userMessage).then((response) => {
-      const newBotMessage = {sender: 'bot', text: response}
-      setMessagesBySession((prev) => {
-        const currentMessages = prev[currentSessionId] || []
-        return {
-          ...prev,
-          [currentSessionId]: [...currentMessages, newBotMessage],
-        }
-      })
-    })
     setUserMessage('')
   }
-
-  useEffect(handleNewConversation, [])
 
   return (
     <div className="flex h-screen w-full bg-gray-100">
@@ -134,7 +155,8 @@ export default function App() {
                 }`}
               >
                 {msg.sender === 'bot' && <>🤖 챗봇<br/></>}
-                {msg.text}
+                {msg.sender === 'bot' ?
+                  <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(msg.text)}}></div> : msg.text}
               </div>
             </div>
           ))}
