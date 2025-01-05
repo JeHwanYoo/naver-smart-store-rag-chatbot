@@ -10,3 +10,11 @@ class StreamingSystemMessageUseCase:
         self.llm_queue_service = llm_queue_service
         self.vector_db_service = vector_db_service
         self.llm_rag_service = llm_rag_service
+
+    def execute(self, streaming_id: str):
+        task = self.llm_queue_service.get(streaming_id)
+
+        if not task:
+            return None
+
+        pass
