@@ -142,9 +142,9 @@ ERD는 매우 심플하게 구성했습니다. 이번 과제의 본질에 벗어
 
 그리고 최신 채팅을 항상 먼저 보여줘야하기 때문에 `created_at`을 정렬키로 설정합니다. (이번 과제에서 커서 기반 페이지네이션은 고려하지 않습니다.)
 
-chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
+faq는 title, content, related_titles로 구분했습니다. title, content는 벡터화하여 검색이 가능합니다.
 
-대화를 하고 있는 session의 문맥만을 참고하기 위해, session_id를 메타데이터로 설정합니다.
+related_titles는 추가 질문을 만들때 활용합니다.
 
 </details>
 
