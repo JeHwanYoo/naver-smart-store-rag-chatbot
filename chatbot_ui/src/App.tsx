@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {v4 as uuidv4} from 'uuid'
 import {useStreaming} from './hooks/UseStreaming'
 import {useSessions} from './hooks/UseSessions'
@@ -18,6 +18,14 @@ export default function App() {
   const {messagesBySession, setMessagesBySession} = useMessagesBySession({sessionId: currentSessionId})
   const {streamingContent, isStreaming} = useStreaming({streamingId})
 
+  // 메시지 컨테이너의 끝을 참조할 ref 생성
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // 스크롤을 맨 아래로 내리는 함수
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'})
+  }
+
   // 처음 마운트될 때 자동으로 새 대화를 생성
   useEffect(() => {
     handleNewConversation()
@@ -30,10 +38,8 @@ export default function App() {
 
     setMessagesBySession((prev) => {
       const currentMessages = prev[currentSessionId] || []
-      // 마지막 메시지가 봇(bot)인지 확인
       const lastMessage = currentMessages[currentMessages.length - 1]
 
-      // 만약 마지막 메시지가 'bot'이 아니라면 새 메시지를 추가
       if (!lastMessage || lastMessage.sender !== 'bot') {
         return {
           ...prev,
@@ -43,7 +49,6 @@ export default function App() {
           ],
         }
       } else {
-        // 마지막 메시지가 'bot'이면 해당 메시지에 문자열을 갱신
         const updatedLastMessage = {
           ...lastMessage,
           text: streamingContent,
@@ -57,7 +62,15 @@ export default function App() {
         }
       }
     })
+
+    // 메시지가 업데이트 된 후 스크롤을 맨 아래로 내림
+    scrollToBottom()
   }, [streamingContent, currentSessionId])
+
+  // 메시지가 변경될 때마다 스크롤을 맨 아래로 내림
+  useEffect(() => {
+    scrollToBottom()
+  }, [messagesBySession, currentSessionId])
 
   function handleNewConversation() {
     const newSessionId = generateUUID()
@@ -108,11 +121,11 @@ export default function App() {
       <div className="w-1/4 border-r bg-white p-4">
         <button
           className={`
-      w-full p-2 rounded mb-4
-      text-white bg-green-500
-      hover:bg-green-600
-      disabled:bg-gray-400 disabled:cursor-not-allowed
-    `}
+            w-full p-2 rounded mb-4
+            text-white bg-green-500
+            hover:bg-green-600
+            disabled:bg-gray-400 disabled:cursor-not-allowed
+          `}
           onClick={handleNewConversation}
           disabled={isStreaming}
         >
@@ -127,12 +140,12 @@ export default function App() {
               onClick={() => setCurrentSessionId(session.session_id)}
               disabled={isStreaming}
               className={`
-          cursor-pointer rounded p-2 mb-2 max-w-full
-          overflow-hidden text-ellipsis whitespace-nowrap
-          ${isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
-          disabled:bg-gray-400 disabled:text-gray-200
-          disabled:cursor-not-allowed
-        `}
+                cursor-pointer rounded p-2 mb-2 max-w-full
+                overflow-hidden text-ellipsis whitespace-nowrap
+                ${isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
+                disabled:bg-gray-400 disabled:text-gray-200
+                disabled:cursor-not-allowed
+              `}
             >
               {session.first_message}
             </button>
@@ -160,12 +173,25 @@ export default function App() {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                {msg.sender === 'bot' && <>🤖 챗봇<br/></>}
-                {msg.sender === 'bot' ?
-                  <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(msg.text)}}></div> : msg.text}
+                {msg.sender === 'bot' && (
+                  <>
+                    🤖 챗봇<br/>
+                  </>
+                )}
+                {msg.sender === 'bot' ? (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(msg.text),
+                    }}
+                  ></div>
+                ) : (
+                  msg.text
+                )}
               </div>
             </div>
           ))}
+          {/* 스크롤을 내리기 위한 빈 div */}
+          <div ref={messagesEndRef}/>
         </div>
 
         <form
