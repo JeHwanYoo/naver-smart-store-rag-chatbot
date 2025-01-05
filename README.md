@@ -239,7 +239,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: POST /v1/streaming/{streaming_id} 호출
+    User ->> API: GET /v1/streaming/{streaming_id} 호출
     API ->> UseCase: streaming_system_message_use_case.execute(streaming_id) 호출
     UseCase ->> LLMQueue: llm_queue_service.get(streaming_id) 호출
     alt 스트리밍 존재
