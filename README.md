@@ -18,7 +18,8 @@
 
 Docker Compose에서 설치되는 이미지는 다음과 같습니다.
 
-- Python 3.12.7 (Dockerfile)
+- Python 3.12.7 (Dockerfile): 백엔드 서버
+- Node 22.0 (Dockerfile-react): 챗봇 UI (프론트엔드)
 - ChromaDB 0.6.0
 - MongoDB 8.0.4
 
