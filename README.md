@@ -196,17 +196,6 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
     - SSE 스트리밍 메세지
   - 실패(404):
     - `error_message: "streaming_id"가 존재하지 않습니다.`
-
-- GET /v1/sessions/{session_id}/recommends
-  - 설명: 가장 최근 대화의 추천 질문 목록을 받습니다. (3개)
-  - 파라미터
-    - `session_id: string`: 세션 ID
-  - 성공(200)
-    - `session_id: string`: 세션 ID
-    - `chatbot_recommends: string[]`: 추천 질문 목록
-  - 실패(404):
-    - `error_message: "session_id"가 존재하지 않습니다.`
-
 </details>
 
 <details>
@@ -287,31 +276,6 @@ sequenceDiagram
         API -->> User: 404 "streaming_id"가 존재하지 않습니다.
     end
 ```
-
-### 추천 질문 3개 받기
-
-```mermaid
-sequenceDiagram
-    User ->> API: GET /v1/sessions/{session_id}/recommends 호출
-    API ->> UseCase: get_recommendations_use_case.execute(session_id) 호출
-    UseCase ->> Repository: chats_repository.find_by_session_id(session_id) 호출
-    alt 세션 존재
-        Repository -->> UseCase: Chat[] 반환
-        UseCase ->> Repository: chats_repository.find_last_message_by_session_id(session_id) 호출
-        Repository -->> UseCase: user_message, system_message 반환
-        UseCase ->> LLMRAG: llm_rag_service.find_recommended_questions(user_message, system_message) 호출
-        LLMRAG -->> UseCase: chatbot_recommends 반환
-        UseCase ->> Repository: chats_repository.update(session_id, chatbot_recommends) 호출
-        Repository -->> UseCase: 업데이트 성공
-        UseCase -->> API: session_id, chatbot_recommends 반환
-        API -->> User: 200 session_id, chatbot_recommends 반환
-    else 세션 없음
-        Repository -->> UseCase: null 반환
-        UseCase -->> API: 404 "session_id"가 존재하지 않습니다."
-        API -->> User: 404 "session_id"가 존재하지 않습니다."
-    end
-```
-
 </details>
 
 ## 기타
