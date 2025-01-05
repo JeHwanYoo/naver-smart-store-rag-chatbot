@@ -3,15 +3,21 @@ from datetime import datetime, timedelta
 
 import pytest
 import pytest_asyncio
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from .main import app
 
 
-@pytest.fixture(scope='function')
-def http_client():
-    return TestClient(app)
+@pytest_asyncio.fixture(scope='function')
+async def http_client():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(
+        transport=transport,
+        base_url='http://test/',
+        follow_redirects=True,
+    ) as client:
+        yield client
 
 
 @pytest.fixture(scope='function')
@@ -81,7 +87,11 @@ async def dummy_chats_in_session(motor_client: AsyncIOMotorClient):
     session_id = chat_histories[0]['session_id']
     test_db = motor_client.get_database('test_db')
     coll = test_db.get_collection('chat_histories')
-    return await coll.find({'session_id': session_id}).sort('created_at', 1).to_list(length=None)
+    return (
+        await coll.find({'session_id': session_id}, {'_id': 0, 'session_id': 1, 'user_message': 1, 'system_message': 1})
+        .sort('created_at', 1)
+        .to_list(length=None)
+    )
 
 
 async def clear_test_db(motor_client: AsyncIOMotorClient):
@@ -94,8 +104,9 @@ async def clean_test_db(motor_client: AsyncIOMotorClient):
     await clear_test_db(motor_client)
 
 
-def test_root(http_client: TestClient):
-    response = http_client.get('/v1')
+@pytest.mark.asyncio
+async def test_root(http_client: AsyncClient):
+    response = await http_client.get('/v1')
     assert response.status_code == 200
     assert response.text == '"OK"'
 
@@ -107,8 +118,8 @@ async def test_motor(motor_client: AsyncIOMotorClient):
 
 
 @pytest.mark.asyncio
-async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorClient, dummy_sessions):
-    response = http_client.get('/v1/sessions')
+async def test_get_sessions(http_client: AsyncClient, motor_client: AsyncIOMotorClient, dummy_sessions):
+    response = await http_client.get('/v1/sessions')
 
     assert response.status_code == 200
     assert response.json() == dummy_sessions
@@ -116,9 +127,10 @@ async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorC
 
 @pytest.mark.asyncio
 async def test_get_chats_by_session_id(
-    http_client: TestClient, motor_client: AsyncIOMotorClient, dummy_chats_in_session
+    http_client: AsyncClient, motor_client: AsyncIOMotorClient, dummy_chats_in_session
 ):
     session_id = dummy_chats_in_session[0]['session_id']
-    response = http_client.get(f'/v1/sessions/{session_id}/chats')
+    response = await http_client.get(f'/v1/sessions/{session_id}/chats')
 
     assert response.status_code == 200
+    assert response.json() == dummy_chats_in_session
