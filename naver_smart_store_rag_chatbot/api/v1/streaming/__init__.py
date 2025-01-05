@@ -22,7 +22,7 @@ async def stream_system_message(
     ),
 ):
     async def event_generator():
-        for chunk in await streaming_system_message_use_case.execute(streaming_id):
+        async for chunk in streaming_system_message_use_case.execute(streaming_id):
             if await request.is_disconnected():
                 break
             yield chunk

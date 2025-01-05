@@ -34,21 +34,34 @@ class ChromaDBVectorDBService(VectorDBService):
 
         documents: List[Document] = []
 
-        def follow_chain(start_idx: int) -> dict:
-            current_idx = start_idx
+        doc_idx_map = {}
+        for i, metadata in enumerate(chroma_metadatas):
+            d_idx = metadata.get('doc_idx')
+            if d_idx:
+                doc_idx_map[d_idx] = i
+
+        def follow_chain(start_doc_idx: str) -> dict:
+            if not start_doc_idx or start_doc_idx.strip() == '':
+                return {'content': '', 'related_titles': []}
+
             content_parts = []
             related_titles_parts = []
 
-            while current_idx is not None and current_idx < len(chroma_metadatas):
-                metadata = chroma_metadatas[current_idx]
-                content_parts.append(chroma_documents[current_idx])
-                related_titles_parts.extend(metadata.get('related_titles', '').split(','))
-                next_idx = metadata.get('next')
+            current_doc_idx = start_doc_idx
 
-                if not next_idx or next_idx == '':
+            while True:
+                index = doc_idx_map[current_doc_idx]
+
+                content_parts.append(chroma_documents[index])
+                related_titles = chroma_metadatas[index].get('related_titles', '')
+                if related_titles:
+                    related_titles_parts.extend(related_titles.split(','))
+
+                next_idx = chroma_metadatas[index].get('next')
+                if not next_idx or next_idx.strip() == '':
                     break
 
-                current_idx = int(next_idx)
+                current_doc_idx = next_idx
 
             return {
                 'content': ' '.join(content_parts),

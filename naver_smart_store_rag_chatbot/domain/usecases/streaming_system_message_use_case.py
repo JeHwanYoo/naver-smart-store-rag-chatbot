@@ -18,7 +18,7 @@ class StreamingSystemMessageUseCase:
         self.llm_rag_service = llm_rag_service
 
     async def execute(self, streaming_id: str):
-        task = self.llm_queue_service.get(streaming_id)
+        task = await self.llm_queue_service.get(streaming_id)
 
         if not task:
             return
@@ -34,9 +34,8 @@ class StreamingSystemMessageUseCase:
             related_documents=related_documents,
             recent_chats=recent_chats,
         ):
-            content = chunk.choices[0].delta.content
-            if content:
-                system_message += content
-                yield content
+            if chunk:
+                system_message += chunk
+                yield chunk
 
-        await self.chat_repository.save(session_id, user_message=user_message, system_message=system_message)
+        # await self.chat_repository.save(session_id, user_message=user_message, system_message=system_message)
