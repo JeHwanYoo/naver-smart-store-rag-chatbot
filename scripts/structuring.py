@@ -21,7 +21,11 @@ def extract_related_title(pkl: List[Dict]) -> List[Dict]:
         return []
 
     return [
-        {'title': item['title'], 'content': item['content'], 'related_titles': extract_titles(item['content'])}
+        {
+            'title': item['title'],
+            'content': f'제목: {item['title']}\n\n답변: {item['content']}',
+            'related_titles': extract_titles(item['content']),
+        }
         for item in pkl
     ]
 

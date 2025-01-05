@@ -66,7 +66,7 @@ You must apply the following styles to <ul> and <ol>:
             {
                 'role': 'user',
                 'content': f"""
-FAQ Documents: {'\n\n'.join([f'질문:{doc.title} \n답변: {doc.content}' for doc in related_documents])}
+FAQ Documents: {'\n\n'.join([doc.content for doc in related_documents])}
 Previous Questions and Context: {'\n\n'.join([f'사용자 질문: {chat.user_message}\n챗봇 답변: {chat.system_message}' for chat in recent_chats])}
 Related Titles: {', '.join([', '.join(doc.related_titles) for doc in related_documents])}
 
