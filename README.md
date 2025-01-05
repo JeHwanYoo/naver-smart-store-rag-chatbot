@@ -281,6 +281,25 @@ sequenceDiagram
 ## 기타
 
 <details>
+  <summary>E2E 테스트 코드</summary>
+
+`naver_smart_store_rag_chatbot/test_e2e.py`에 E2E 테스트를 구현했습니다.
+
+### 의존성 설치
+
+```sh
+poetry install
+```
+
+### 테스트 실행
+
+```sh
+poetry run pytest
+```
+
+</details>
+
+<details>
   <summary>Commit convention</summary>
 
 - 커밋 컨벤션은 [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) 규칙을 사용합니다.
