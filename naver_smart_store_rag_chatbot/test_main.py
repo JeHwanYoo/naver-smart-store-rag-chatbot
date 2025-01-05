@@ -20,8 +20,7 @@ def motor_client():
     return AsyncIOMotorClient('mongodb://root:example@localhost:27017/')
 
 
-@pytest_asyncio.fixture(scope='function')
-async def dummy_sessions(motor_client: AsyncIOMotorClient):
+async def create_dummy_chat_histories(motor_client: AsyncIOMotorClient):
     test_db = motor_client.get_database('test_db')
     coll = test_db.get_collection('chat_histories')
     chat_history_session_ids = [
@@ -48,6 +47,12 @@ async def dummy_sessions(motor_client: AsyncIOMotorClient):
 
     await coll.insert_many(chat_histories)
 
+    return chat_histories
+
+
+@pytest_asyncio.fixture(scope='function')
+async def dummy_sessions(motor_client: AsyncIOMotorClient):
+    chat_histories = await create_dummy_chat_histories(motor_client)
     grouped = defaultdict(list)
 
     for history in chat_histories:
