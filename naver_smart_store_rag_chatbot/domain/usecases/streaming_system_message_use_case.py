@@ -38,4 +38,4 @@ class StreamingSystemMessageUseCase:
                 system_message += chunk
                 yield chunk
 
-        # await self.chat_repository.save(session_id, user_message=user_message, system_message=system_message)
+        await self.chat_repository.save(session_id, user_message=user_message, system_message=system_message)

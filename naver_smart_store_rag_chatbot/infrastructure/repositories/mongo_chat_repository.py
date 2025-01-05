@@ -12,7 +12,7 @@ class MongoChatRepository(ChatRepository):
     async def save(self, session_id: str, user_message: str, system_message: str) -> None:
         async with get_mongo_database() as db:
             coll = db.get_collection(collection_name)
-            coll.insert_one(
+            await coll.insert_one(
                 {
                     'session_id': session_id,
                     'user_message': user_message,
