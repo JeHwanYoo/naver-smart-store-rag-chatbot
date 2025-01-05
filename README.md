@@ -201,67 +201,21 @@ related_titles는 추가 질문을 만들때 활용합니다.
 
 ### 대화 세션 목록 조회
 
-```mermaid
-sequenceDiagram
-    User ->> API: GET /v1/sessions 호출
-    API ->> UseCase: find_all_chat_sessions_use_case.execute() 호출
-    UseCase ->> Repository: chat_sessions_repository.find_all() 호출
-    Repository -->> UseCase: ChatSession[] 반환
-    UseCase -->> API: ChatSession[] 반환
-    API -->> User: ChatSession[] 반환
-```
+<img src="./assets/sequence_1.png" alt="" width="1200">
 
 ### 특정 세션의 대화 목록 조회
 
-```mermaid
-sequenceDiagram
-    User ->> API: GET /v1/sessions/{session_id}/chats 호출
-    API ->> UseCase: find_chats_by_session_id_use_case.execute() 호출
-    UseCase ->> Repository: chat_repository.find_by_session_id() 호출
-    Repository -->> UseCase: Chat[] 반환
-    UseCase -->> API: Chat[] 반환
-    API -->> User: Chat[] 반환
-```
+<img src="./assets/sequence_2.png" alt="" width="1200">
 
 ### 유저 메시지 전송 (작업 큐에 전송)
 
-```mermaid
-sequenceDiagram
-    User ->> API: POST /v1/sessions/{session_id}/chats 호출
-    API ->> UseCase: send_user_message_use_case.execute(session_id, user_message) 호출
-    UseCase ->> LLMQueue: llm_queue_service.add(session_id, user_message) 호출 (TTL 1분)
-    LLMQueue -->> UseCase: streaming_id 반환
-    UseCase -->> API: session_id, streaming_id 반환
-    API -->> User: 201 session_id, streaming_id 반환
-```
+<img src="./assets/sequence_3.png" alt="" width="1200">
 
 1분 이내로 스트리밍을 호출하지 않으면, LLMQueue에서 스트리밍 ID를 삭제합니다.
 
 ### LLM 응답 스트리밍
 
-```mermaid
-sequenceDiagram
-    User ->> API: GET /v1/streaming/{streaming_id} 호출
-    API ->> UseCase: streaming_system_message_use_case.execute(streaming_id) 호출
-    UseCase ->> LLMQueue: llm_queue_service.get(streaming_id) 호출
-    alt 스트리밍 존재
-        LLMQueue -->> UseCase: session_id, user_message 반환
-        UseCase ->> VectorDB: vector_db_service.find_related_documents(user_message, limit=n) 호출
-        VectorDB -->> UseCase: related_n_documents 반환
-        UseCase ->> Repository: chat_repository.find_recent_chats(session_id, limit=n) 호출
-        Repository -->> UseCase: recent_n_chats 반환
-        UseCase --> LLMRAG: llm_rag_service.send_question(user_message, related_n_documents, recent_n_chats) 호출
-        LLMRAG --> UseCase: system_message를 스트리밍 방식으로 전송
-        UseCase -->> API: system_message를 스트리밍 방식으로 전송
-        API -->> User: 200 system_message를 스트리밍 방식으로 전송 (SSE)
-        UseCase ->> Repository: chat_repository.save(session_id, user_message, system_message) 저장
-        Repository -->> UseCase: 저장 성공
-    else 스트리밍 없음
-        Repository -->> UseCase: null 반환
-        UseCase -->> API: null 반환
-        API -->> User: 404 "streaming_id"가 존재하지 않습니다.
-    end
-```
+<img src="./assets/sequence_4.png" alt="" width="1200">
 </details>
 
 ## 기타
