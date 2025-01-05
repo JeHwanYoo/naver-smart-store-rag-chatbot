@@ -18,6 +18,14 @@ services:
         condition: service_healthy
       mongo:
         condition: service_healthy
+  chatbot-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile-react
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./chatbot_ui/src:/app/src
   chroma:
     image: ghcr.io/chroma-core/chroma:0.6.0
     restart: always
