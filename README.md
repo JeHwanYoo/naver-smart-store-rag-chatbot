@@ -215,7 +215,7 @@ sequenceDiagram
 sequenceDiagram
     User ->> API: GET /v1/sessions/{session_id}/chats 호출
     API ->> UseCase: find_chats_by_session_id_use_case.execute() 호출
-    UseCase ->> Repository: chats_repository.find_by_session_id() 호출
+    UseCase ->> Repository: chat_repository.find_by_session_id() 호출
     Repository -->> UseCase: Chat[] 반환
     UseCase -->> API: Chat[] 반환
     API -->> User: Chat[] 반환
@@ -244,7 +244,7 @@ sequenceDiagram
     UseCase ->> LLMQueue: llm_queue_service.get(streaming_id) 호출
     alt 스트리밍 존재
         LLMQueue -->> UseCase: session_id, user_message 반환
-        UseCase ->> Repository: chats_repository.find_recent_messages(session_id, limit=n) 호출
+        UseCase ->> Repository: chat_repository.find_recent_messages(session_id, limit=n) 호출
         Repository -->> UseCase: recent_n_chats 반환
         UseCase ->> VectorDB: vector_db_service.find_similar_messages(session_id, user_message, limit=n) 호출
         VectorDB -->> UseCase: similar_n_chats 반환
@@ -254,7 +254,7 @@ sequenceDiagram
         API -->> User: 200 system_message를 스트리밍 방식으로 전송 (SSE)
         UseCase ->> VectorDB: vector_db_service.save(session_id, user_message, system_message) 저장
         VectorDB -->> UseCase: 저장 성공
-        UseCase ->> Repository: chats_repository.save(session_id, user_message, system_message) 저장
+        UseCase ->> Repository: chat_repository.save(session_id, user_message, system_message) 저장
         Repository -->> UseCase: 저장 성공
     else 스트리밍 없음
         Repository -->> UseCase: null 반환
