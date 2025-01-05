@@ -38,8 +38,8 @@ async def create_dummy_chat_histories(motor_client: AsyncIOMotorClient):
                 {
                     'session_id': session_id,
                     'created_at': base_time + timedelta(minutes=i),
-                    'user_message': 'fake user message',
-                    'system_message': 'fake system message',
+                    'user_message': f'fake user message: {i}',
+                    'system_message': f'fake system message: {i}',
                     'recommends': ['fake recommends'],
                 }
             )
