@@ -113,3 +113,13 @@ async def test_get_sessions(http_client: TestClient, motor_client: AsyncIOMotorC
 
     assert response.status_code == 200
     assert response.json() == dummy_sessions
+
+
+@pytest.mark.asyncio
+async def test_get_chats_by_session_id(
+    http_client: TestClient, motor_client: AsyncIOMotorClient, dummy_chats_in_session
+):
+    session_id = dummy_chats_in_session[0]['session_id']
+    response = http_client.get(f'/v1/sessions/{session_id}/chats')
+
+    assert response.status_code == 200
