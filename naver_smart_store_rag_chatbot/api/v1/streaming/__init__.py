@@ -25,7 +25,7 @@ async def stream_system_message(
         async for chunk in streaming_system_message_use_case.execute(streaming_id):
             if await request.is_disconnected():
                 break
-            yield chunk
+            yield f'data: {chunk}\n\n'
 
     return StreamingResponse(
         event_generator(), media_type='text/event-stream', headers={'Content-Type': 'text/event-stream; charset=utf-8'}
