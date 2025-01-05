@@ -6,13 +6,18 @@ from naver_smart_store_rag_chatbot.infrastructure.repositories.mongo_chat_reposi
 from naver_smart_store_rag_chatbot.infrastructure.repositories.mongo_chat_session_repository import (
     MongoChatSessionRepository,
 )
+from naver_smart_store_rag_chatbot.infrastructure.services.cachetools_llm_queue_service import CachetoolsLLMQueueService
 
 app = FastAPI()
 
 app.include_router(v1_router)
 
 # DI
-container = Container(chat_session_repository=MongoChatSessionRepository(), chat_repository=MongoChatRepository())
+container = Container(
+    chat_session_repository=MongoChatSessionRepository(),
+    chat_repository=MongoChatRepository(),
+    llm_queue_service=CachetoolsLLMQueueService(),
+)
 container.wire(
     modules=[
         'naver_smart_store_rag_chatbot.api.v1.sessions',
