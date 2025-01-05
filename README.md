@@ -91,7 +91,6 @@ poetry run python scripts/vectorizing.py
   - LLM: [openai](https://github.com/openai/openai-python)
   - Database: [MongoDB](https://www.mongodb.com/)
     - [motor](https://www.mongodb.com/ko-kr/docs/drivers/motor/#std-label-python-async-driver)
-  - Evaluation: [RAGAS](https://docs.ragas.io/en/stable/)
   - TTL Cache: [cachetools](https://github.com/tkem/cachetools/)
 - 임베딩/LLM 모델 사양 및 가격
   - text-embedding-3-small
@@ -103,16 +102,13 @@ poetry run python scripts/vectorizing.py
     - $0.150 / 1M input tokens
     - $0.600 / 1M output tokens
 - 기능 요구사항
-  - [ ] 001 FAQ 데이터 기반으로 답변 제공
-  - [ ] 002 대화 맥락을 저장
-  - [ ] 003 대화 맥락을 기반으로 답변 제공
-    - [ ] 003-1 이전 질문과 상황을 토대로 적절한 답변을 제공
-    - [ ] 003-2 전체적인 대화 기록을 토대로 적절한 답변을 제공
-  - [ ] 004 대화 맥락을 기반으로 추가 질문 제시
-  - [ ] 005 스마스스토어와 관련없는 내용은 답변하지 않음
-  - [ ] 006 스트리밍 방식의 채팅 제공
-- 비기능 요구사항
-  - [ ] 001 Faithfulness, Answer Relevancy 0.8 이상
+  - [x] 001 FAQ 데이터 기반으로 답변 제공
+  - [x] 002 대화 맥락을 저장
+  - [x] 003 대화 맥락을 기반으로 답변 제공
+    - [x] 003-1 이전 질문과 상황을 토대로 적절한 답변을 제공
+  - [x] 004 대화 맥락을 기반으로 추가 질문 제시
+  - [x] 005 스마스스토어와 관련없는 내용은 답변하지 않음
+  - [x] 006 스트리밍 방식의 채팅 제공
 
 </details>
 
