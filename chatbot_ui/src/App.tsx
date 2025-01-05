@@ -18,7 +18,7 @@ const dummySessions = [
 function mockSendMessage(message: string): Promise<string> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(`챗봇의 응답: "${message}"에 대한 답변입니다.`)
+      resolve(`"${message}"에 대한 답변입니다: `)
     }, 1000)
   })
 }
@@ -96,6 +96,7 @@ export default function App() {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
+                {msg.sender == 'bot' && <>🤖 챗봇<br/></>}
                 {msg.text}
               </div>
             </div>
