@@ -33,5 +33,6 @@ container = Container(
 container.wire(
     modules=[
         'naver_smart_store_rag_chatbot.api.v1.sessions',
+        'naver_smart_store_rag_chatbot.api.v1.streaming',
     ]
 )
