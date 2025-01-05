@@ -25,6 +25,5 @@ class Container(containers.DeclarativeContainer):
 
     send_user_message_use_case = providers.Factory(
         SendUserMessageUseCase,
-        chat_repository=chat_repository,
         llm_queue_service=llm_queue_service,
     )
