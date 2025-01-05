@@ -10,4 +10,7 @@ COPY chatbot_ui/ ./
 
 EXPOSE 5173
 
+ARG VITE_API_PATH
+ENV VITE_API_PATH=${VITE_API_PATH}
+
 CMD ["npm", "run", "dev", "--", "--host"]

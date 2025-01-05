@@ -22,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-react
+      args:
+        - VITE_API_PATH=http://localhost:8080
     ports:
       - "5173:5173"
     volumes:
