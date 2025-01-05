@@ -1,5 +1,4 @@
 import uuid
-from collections import defaultdict
 from datetime import datetime, timedelta
 
 import pytest
@@ -52,23 +51,28 @@ async def create_dummy_chat_histories(motor_client: AsyncIOMotorClient):
 
 @pytest_asyncio.fixture(scope='function')
 async def dummy_sessions(motor_client: AsyncIOMotorClient):
-    chat_histories = await create_dummy_chat_histories(motor_client)
-    grouped = defaultdict(list)
-
-    for history in chat_histories:
-        grouped[history['session_id']].append(history)
-
-    results = []
-    for session_id, histories in grouped.items():
-        sorted_histories = sorted(histories, key=lambda x: x['created_at'], reverse=True)
-        first_message = sorted_histories[-1]['user_message']
-        latest_created_at = sorted_histories[0]['created_at']
-
-        results.append({'session_id': session_id, 'created_at': latest_created_at, 'first_message': first_message})
-
-    results.sort(key=lambda x: x['created_at'], reverse=True)
-
-    return [{'session_id': r['session_id'], 'first_message': 'fake user message'} for r in results]
+    await create_dummy_chat_histories(motor_client)
+    test_db = motor_client.get_database('test_db')
+    coll = test_db.get_collection('chat_histories')
+    return await coll.aggregate(
+        [
+            {
+                '$group': {
+                    '_id': '$session_id',
+                    'created_at': {'$max': '$created_at'},
+                    'first_message': {'$first': '$user_message'},
+                }
+            },
+            {'$sort': {'created_at': -1}},
+            {
+                '$project': {
+                    '_id': 0,
+                    'session_id': '$_id',
+                    'first_message': '$first_message',
+                }
+            },
+        ]
+    ).to_list(length=None)
 
 
 @pytest_asyncio.fixture(scope='function')
