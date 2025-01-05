@@ -16,7 +16,7 @@ export default function App() {
   const [streamingId, setStreamingId] = useState('')
 
   const {messagesBySession, setMessagesBySession} = useMessagesBySession({sessionId: currentSessionId})
-  const {streamingContent} = useStreaming({streamingId})
+  const {streamingContent, isStreaming} = useStreaming({streamingId})
 
   // 처음 마운트될 때 자동으로 새 대화를 생성
   useEffect(() => {
@@ -107,24 +107,37 @@ export default function App() {
     <div className="flex h-screen w-full bg-gray-100">
       <div className="w-1/4 border-r bg-white p-4">
         <button
-          className="w-full bg-green-500 text-white p-2 rounded mb-4"
+          className={`
+      w-full p-2 rounded mb-4
+      text-white bg-green-500
+      hover:bg-green-600
+      disabled:bg-gray-400 disabled:cursor-not-allowed
+    `}
           onClick={handleNewConversation}
+          disabled={isStreaming}
         >
           새로운 대화
         </button>
-        {sessions.map((session) => (
-          <div
-            key={session.session_id}
-            onClick={() => setCurrentSessionId(session.session_id)}
-            className={`cursor-pointer rounded p-2 mb-2 max-w-full overflow-hidden text-ellipsis whitespace-nowrap ${
-              currentSessionId === session.session_id
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-800'
-            }`}
-          >
-            {session.first_message}
-          </div>
-        ))}
+
+        {sessions.map((session) => {
+          const isCurrent = currentSessionId === session.session_id
+          return (
+            <button
+              key={session.session_id}
+              onClick={() => setCurrentSessionId(session.session_id)}
+              disabled={isStreaming}
+              className={`
+          cursor-pointer rounded p-2 mb-2 max-w-full
+          overflow-hidden text-ellipsis whitespace-nowrap
+          ${isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
+          disabled:bg-gray-400 disabled:text-gray-200
+          disabled:cursor-not-allowed
+        `}
+            >
+              {session.first_message}
+            </button>
+          )
+        })}
       </div>
 
       <div className="flex flex-col w-3/4 h-[90vh] max-w-2xl mx-auto my-auto rounded-lg bg-white shadow-lg">
@@ -155,18 +168,23 @@ export default function App() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="border-t p-4">
+        <form
+          onSubmit={isStreaming ? (e) => e.preventDefault() : handleSubmit}
+          className="border-t p-4"
+        >
           <div className="flex gap-2">
             <input
               type="text"
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
+              disabled={isStreaming}
               className="flex-1 rounded border border-gray-300 p-2 outline-none focus:border-blue-400"
               placeholder="메시지를 입력하세요..."
             />
             <button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              disabled={isStreaming}
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               전송
             </button>

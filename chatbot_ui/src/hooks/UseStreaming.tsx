@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 
 export function useStreaming(props: { streamingId: string }) {
   const [streamingContent, setStreamingContent] = useState('')
+  const [isStreaming, setIsStreaming] = useState(false)
 
   useEffect(() => {
     if (!props.streamingId) return
@@ -11,6 +12,7 @@ export function useStreaming(props: { streamingId: string }) {
     )
 
     eventSource.onopen = () => {
+      setIsStreaming(true)
       setStreamingContent('')
     }
 
@@ -19,13 +21,15 @@ export function useStreaming(props: { streamingId: string }) {
     }
 
     eventSource.onerror = () => {
+      setIsStreaming(false)
       eventSource.close()
     }
 
     return () => {
+      setIsStreaming(false)
       eventSource.close()
     }
   }, [props.streamingId])
 
-  return {streamingContent}
+  return {streamingContent, isStreaming}
 }
