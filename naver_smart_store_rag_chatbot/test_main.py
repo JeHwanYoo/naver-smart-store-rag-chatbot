@@ -134,3 +134,15 @@ async def test_get_chats_by_session_id(
 
     assert response.status_code == 200
     assert response.json() == dummy_chats_in_session
+
+
+async def test_send_user_message(http_client: AsyncClient, motor_client: AsyncIOMotorClient, dummy_chats_in_session):
+    session_id = dummy_chats_in_session[0]['session_id']
+    response = await http_client.post(f'/v1/sessions/{session_id}/chats', json={'user_message': 'new message'})
+
+    assert response.status_code == 201
+
+    result = response.json()
+
+    assert result['session_id'] == session_id
+    assert type(result['streaming_id']) is str
