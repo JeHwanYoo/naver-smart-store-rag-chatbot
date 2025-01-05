@@ -1,4 +1,5 @@
 import asyncio
+from typing import Optional, Tuple
 from uuid import uuid4
 
 from cachetools import TTLCache
@@ -16,3 +17,9 @@ class CachetoolsLLMQueueService(LLMQueueService):
         async with self.lock:
             self.cache[str(streaming_id)] = (session_id, user_message)
         return str(streaming_id)
+
+    async def get(self, streaming_id: str) -> Optional[Tuple[str, str]]:
+        async with self.lock:
+            if self.cache.get(streaming_id) is None:
+                return None
+            return self.cache.pop(streaming_id)
