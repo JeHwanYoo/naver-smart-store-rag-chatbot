@@ -184,7 +184,7 @@ chat_vectorized는 대화 문맥을 검색하기 위한 VectorDB 입니다.
     - `session_id: string`: 세션 ID
     - `streaming_id: string`: SSE 통신을 위한 스트리밍 키
 
-- GET /v1/streaming/{streaming_id}
+- POST /v1/streaming/{streaming_id}
   - 설명: 특정 스트리밍 id를 이용하여 답변에 대한 스트리밍을 받습니다.
   - 파라미터:
     - `streaming_id: string`: 세션 ID
@@ -239,12 +239,10 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    User ->> API: GET /v1/sessions/{session_id}/recommends 호출
-    API ->> UseCase: find_recommends_by_session_id_use_case.execute(session_id) 호출
-    UseCase ->> Repository: streaming_system_message_repository.find_one_by_session_id(streaming_id) 호출
+    User ->> API: POST /v1/streaming/{streaming_id} 호출
+    API ->> UseCase: streaming_system_message_use_case.execute(streaming_id) 호출
+    UseCase ->> LLMQueue: llm_queue_service.get(streaming_id) 호출
     alt 스트리밍 존재
-        Repository -->> UseCase: Streaming 반환
-        UseCase ->> LLMQueue: llm_queue_service.find_one_by_streaming_id(streaming_id) 호출
         LLMQueue -->> UseCase: session_id, user_message 반환
         UseCase ->> Repository: chats_repository.find_recent_messages(session_id, limit=n) 호출
         Repository -->> UseCase: recent_n_chats 반환
