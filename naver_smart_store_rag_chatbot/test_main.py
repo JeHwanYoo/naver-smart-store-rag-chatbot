@@ -146,3 +146,14 @@ async def test_send_user_message(http_client: AsyncClient, motor_client: AsyncIO
 
     assert result['session_id'] == session_id
     assert type(result['streaming_id']) is str
+
+
+async def test_fail_send_user_message(http_client: AsyncClient, motor_client: AsyncIOMotorClient):
+    fake_session_id = str(uuid.uuid4())
+    response = await http_client.post(f'/v1/sessions/{fake_session_id}/chats', json={'user_message': 'new message'})
+
+    assert response.status_code == 404
+
+    result = response.json()
+
+    assert result['detail'] == f'Session ID "{fake_session_id}"가 존재하지 않습니다.'
