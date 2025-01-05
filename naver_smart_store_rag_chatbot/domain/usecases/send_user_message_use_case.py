@@ -1,4 +1,4 @@
-from naver_smart_store_rag_chatbot.domain.interfaces.chat_repository import ChatRepository
+from naver_smart_store_rag_chatbot.domain.interfaces.repositories.chat_repository import ChatRepository
 
 
 class SendUserMessageUseCase:

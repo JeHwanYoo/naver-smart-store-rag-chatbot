@@ -1,7 +1,7 @@
 from typing import List
 
 from naver_smart_store_rag_chatbot.domain.entities.chat import Chat
-from naver_smart_store_rag_chatbot.domain.interfaces.chat_repository import ChatRepository
+from naver_smart_store_rag_chatbot.domain.interfaces.repositories.chat_repository import ChatRepository
 from naver_smart_store_rag_chatbot.infrastructure.repositories.mongo_client import get_mongo_database
 
 collection_name = 'chat_histories'

@@ -1,4 +1,4 @@
-from naver_smart_store_rag_chatbot.domain.interfaces.chat_session_repository import ChatSessionRepository
+from naver_smart_store_rag_chatbot.domain.interfaces.repositories.chat_session_repository import ChatSessionRepository
 
 
 class FindAllChatSessionsUseCase:
