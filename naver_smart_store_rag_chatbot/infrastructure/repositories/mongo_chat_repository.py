@@ -10,7 +10,7 @@ collection_name = 'chat_histories'
 class MongoChatRepository(ChatRepository):
     async def find_by_session_id(self, session_id: str) -> List[Chat]:
         coll = mongo_main_db.get_collection(collection_name)
-        cursor = coll.find({'session_id': session_id})
+        cursor = coll.find({'session_id': session_id}).sort('created_at', 1)
         results = await cursor.to_list(length=None)
 
         return [
