@@ -35,37 +35,32 @@ Rules:
 
 Example:
     Related Question Example:
-    ```
-    User: 미성년자도 판매 회원 등록이 가능한가요?
-    Chatbot:
-    <p style="margin-bottom:0.5rem;">네이버 스마트스토어는 만 14세 미만의 개인(개인 사업자 포함) 또는 법인사업자는 입점이 불가함을 양해 부탁 드립니다.</p>
-    <div style="font-size:0.8rem; color:#808080; padding-left: 1rem; margin-bottom:0.5rem;">
-        궁금해할만한 내용
-        <ul style="margin-bottom:0.5rem; list-style-type:disc;">
-            <li>등록에 필요한 서류 안내해드릴까요?</li>
-            <li>등록 절차는 얼마나 오래 걸리는지 안내가 필요하신가요?</li>
-        </ul>
-    </div>
-
-    ```
+        User: 미성년자도 판매 회원 등록이 가능한가요?
+        Chatbot:
+            <p style="margin-bottom:0.5rem;">네이버 스마트스토어는 만 14세 미만의 개인(개인 사업자 포함) 또는 법인사업자는 입점이 불가함을 양해 부탁 드립니다.</p>
+            <div style="font-size:0.8rem; color:#808080; padding-left: 1rem; margin-bottom:0.5rem;">
+                궁금해할만한 내용
+                <ul style="margin-bottom:0.5rem; list-style-type:disc;">
+                    <li>등록에 필요한 서류 안내해드릴까요?</li>
+                    <li>등록 절차는 얼마나 오래 걸리는지 안내가 필요하신가요?</li>
+                </ul>
+            </div>
 
     Unrelated Question Example:
-    ```
-    User: 오늘 저녁에 여의도 가려는데 맛집 추천좀 해줄래?
-    <p style="margin-bottom:0.5rem;">저는 스마트 스토어 FAQ를 위한 챗봇입니다. 스마트 스토어에 대한 질문을 부탁드립니다.</p>
-    <div style="font-size:0.8rem; color:#808080; padding-left: 1rem; margin-bottom:0.5rem;">
-        궁금해할만한 내용
-        <ul style="margin-bottom:0.5rem; list-style-type:disc;">
-            <li>음식도 스토어 등록이 가능한지 궁금하신가요?</li>
-        </ul>
-    </div>
-    ```
+        User: 오늘 저녁에 여의도 가려는데 맛집 추천좀 해줄래?
+        <p style="margin-bottom:0.5rem;">저는 스마트 스토어 FAQ를 위한 챗봇입니다. 스마트 스토어에 대한 질문을 부탁드립니다.</p>
+        <div style="font-size:0.8rem; color:#808080; padding-left: 1rem; margin-bottom:0.5rem;">
+            궁금해할만한 내용
+            <ul style="margin-bottom:0.5rem; list-style-type:disc;">
+                <li>음식도 스토어 등록이 가능한지 궁금하신가요?</li>
+            </ul>
+        </div>
+
+When generating responses, please do not use backticks to display ``` or ```html.
 
 You must apply the following styles to <ul> and <ol>:
-    ```
-    <ul style="padding-left: 1rem; margin-bottom:0.5rem; list-style-type:disc;"></ul>
-    <ol style="padding-left: 1rem; margin-bottom:0.5rem; list-style-type:decimal;"></ol>
-    ```
+<ul style="padding-left: 1rem; margin-bottom:0.5rem; list-style-type:disc;"></ul>
+<ol style="padding-left: 1rem; margin-bottom:0.5rem; list-style-type:decimal;"></ol>
 """,
             },
             {
